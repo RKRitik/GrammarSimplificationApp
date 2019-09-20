@@ -169,8 +169,44 @@ def checkUseLess():
 
     return change
 def checkUnReachable():
+    NotReached = list(set(V)-set(start_symbol))
+    change = False
+    for i in range(len(L)):
+        if L[i]==start_symbol :
+            for j in range(len(R[i])):
+               # print(" R[i][j] = " , R[i][j])
+                if len(NotReached)>0:
+                    if R[i][j] in NotReached: #single node
+                        #print('NotREached = ',NotReached , "R[i][j] = ",R[i][j])
+                        NotReached.remove(R[i][j])
+                        change = True
+                        if len(NotReached) == 0:
+                           break
+                    else:               #non single node
+                        #print("len(R[i][j]",len(R[i][j]))
+                        for k in range(len(R[i][j])):
+                           # print(k)
+                            #print(" R[i][j][k] = ", R[i][j][k])
+                            if R[i][j][k] in NotReached:
+                                NotReached.remove(R[i][j][k])
+                                change = True
+                                if len(NotReached) == 0:
+                                    break
+                            else:
+                                print("finding indirect reachables")
+                                print(" R[i][j][k] = ", R[i][j][k])
+                                if R[i][j][k] in V :
+                                    index = L.index(R[i][j][k])
+                                    for node in R[index]:
+                                        for char in node:
+                                            if char in NotReached:
+                                                NotReached.remove(char)
+                                                change = True
+                                                if len(NotReached) == 0:
+                                                    break
+    return NotReached
 
-    return
+
 
 #------------------------------------------------------------------------------------
 #####################entering and checking the productions#######################################
@@ -193,13 +229,15 @@ splitNodes()
 
 # output = checkEpsilon()
 
-# output = checkUnit()
-output = checkUseLess()
-print('L = ' , L)
-print('R = ' , R)
-print('{T} = ',T,end='\n')
-print('{V} = ',V,end='\n')
-print('{S} = ',S,end='\n')
+#output = checkUnit() #someproblem
+#output = checkUseLess()
+print(checkUnReachable())
+#print('L = ' , L)
+#print('R = ' , R)
+#print('{T} = ',T,end='\n')
+#print('{V} = ',V,end='\n')
+#print('{S} = ',S,end='\n')
 printFinal()
+
 #------------------------------------------------------------------------------------
 
