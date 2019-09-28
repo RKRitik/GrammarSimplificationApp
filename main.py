@@ -190,13 +190,14 @@ def checkUnReachable():
                             if R[i][j][k] in NotReached:
                                 NotReached.remove(R[i][j][k])
                                 change = True
-                                if len(NotReached) == 0:
+                            if len(NotReached) == 0:
                                     break
                             else:
-                                print("finding indirect reachables")
-                                print(" R[i][j][k] = ", R[i][j][k])
+                                #print("finding indirect reachables")
+                                #print(" R[i][j][k] = ", R[i][j][k])
                                 if R[i][j][k] in V :
                                     index = L.index(R[i][j][k])
+                                   # print('checking production number ' ,index)
                                     for node in R[index]:
                                         for char in node:
                                             if char in NotReached:
@@ -204,7 +205,13 @@ def checkUnReachable():
                                                 change = True
                                                 if len(NotReached) == 0:
                                                     break
-    return NotReached
+    if len(NotReached)>0:
+        for p in NotReached:
+            index = index = L.index(p)
+            L.remove(p)
+            pR = R[index]
+            R.remove(pR)
+    return change
 
 
 
@@ -217,21 +224,20 @@ while len(p)>0:
 splitNodes()
 #------------------------------------------------------------------------------------
 #####################reducing the productions#######################################
-# change = True
+output = True
 # if output:
-#     output = checkEpsilon()
-#     output = checkUnit()
-#     m m
-#     output = checkUnReachable()
+#      #output = checkEpsilon()#problems
+#      output = checkUnit() #maybeproblems
+#      output = checkUseLess()
+#      output = checkUnReachable()
 
 #------------------------------------------------------------------------------------
+output = checkUnit()
 
 
-# output = checkEpsilon()
+#
 
-#output = checkUnit() #someproblem
-#output = checkUseLess()
-print(checkUnReachable())
+
 #print('L = ' , L)
 #print('R = ' , R)
 #print('{T} = ',T,end='\n')
