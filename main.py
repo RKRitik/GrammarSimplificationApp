@@ -138,15 +138,23 @@ def checkUnit():
                   # print('removing ',val)
                 #   R[i].remove(val) #removing the unit production from production rules
                    #in_ = L.index(val)
-                   values.append(fun_(list_all))
+                   values.extend(fun_(list_all))
                    list_all.clear()
 
 
-        #print('for L = ', L[i], "values = ", values)
         R[i].extend(values)
         list_all.clear()
         values.clear()
-    #                int_+=1
+
+    for i in range(len(L)):
+        temp = []
+        for v in R[i]:
+            if v in V:
+                R[i].remove(v)
+            else:
+                if not v in temp:
+                    temp.append(v)
+        R[i] = temp
     return change
 def fun_(list_all):
     check = 1
