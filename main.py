@@ -5,8 +5,11 @@ epsilon_symbol = 'e'
 S = []
 L = [] #stores all the LHS of the production rules
 R = [] #rhs of productions
+#string = ""
+#temp = ""
+start = 0
 
-
+global_ = []
 #------------------------------------------------------------------------------------
 # T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
 # V = input('Enter the non-terminals ').split() # eg A B
@@ -57,36 +60,53 @@ def splitNodes():
 def checkEpsilon():#check if e is in any of non starting symbols
     change = False
     for i in range(len(L)):
+        print('i = ',i)
         if not L[i]==start_symbol:
+            print('R[i] = ',R[i])
             if epsilon_symbol in R[i]: #checking if RHS contains epsilon
-                print('epsilon found ')
+                print('production : ',L[i],"-> ",R[i])
+                print('epsilon found for L = ',L[i])
                 change = True
                 symbol = L[i]
                 #substituting for e in current  non-terminal
                 for j in  range(len(L)): #replacing this non terminal in other production
-                    print('R[j] = ',R[j])
+                    # print('R[j] = ',R[j])
                     len_ = len(R[j])
-                    print(len_)
-                    flag = False
+                    # print(len_)
+                    #flag = False
                     for k in range(len_ - 1, -1,-1):  # traversing through each node in RHS to find the non terminal uses
+                        global_.clear()
                         #print('k = ',k)
                         n = (R[j][k])
-                        print(R[j][k])
+              #          print(R[j][k])
                         n = list(n)
-                        print('list(n) =', n)
+                        #print('list(n) =', n)
                         temp = n
                         # print('z = ', z , ' i = ', i , 'n = ', n , ' L = ',L)
-                        print('symbol = ',symbol," temp = ",temp)
+               #         print('symbol = ',symbol," temp = ",temp)
                         if symbol in temp:
-                            print('symbol present in node index ', k)
-                            fun(symbol,temp,j,i,n)#recurcive function to find all combinations after substituting the symbol
+                #            print('symbol present in node index ', k)
+                 #           print('R[j][k] = ',R[j][k])
+                            fun(symbol,R[j][k])#recurcive function to find all combinations after substituting the symbol
+                  #          print('out of fun function ')
+                   #         print('for L = ',L[i],' global = ',global_)
+                            R[j].extend(global_)
+                            global_.clear()
+
                         #n = temp  # restoring
 
-                    if  flag and L[j]==start_symbol and not epsilon_symbol in R[j]:
-                        R[j].append(epsilon_symbol)
-                    if epsilon_symbol in R[j] and not L[j] == start_symbol:
-                        R[j].remove(epsilon_symbol)
+                    #if  flag and L[j]==start_symbol and not epsilon_symbol in R[j]:
+                    #    R[j].append(epsilon_symbol)
+                   # if epsilon_symbol in R[j] and not L[j] == start_symbol:
+                    #    R[j].remove(epsilon_symbol)
 
+    for i in range(len(L)):
+         if not L[i]== start_symbol:
+             print('L = ',L[i])
+             for k in range(len_ - 1, -1,-1):
+                # print('R[')
+                 if R[i][k] == epsilon_symbol:
+                     R[i].remove(epsilon_symbol)
     print('new Productions : ')
     for i in range(len(L)):
         print(L[i],'->' , R[i])
@@ -96,17 +116,41 @@ def checkEpsilon():#check if e is in any of non starting symbols
 
 
     return change
-def fun(symbol,temp,j,i,n): ##refactored code from ishaaan
-        print('fun called , temp = ',temp)
-        if temp.count(symbol) > 0 :
-            l = len(temp)
-            for num in range(l - 1, -1,-1):
-                if temp[num] == symbol:
-                    temp1 = temp
-                    del temp1[num]
-                    print('extended temp1 = ',temp1 )
-                    R[j].extend(temp1)
-                    fun(symbol,temp1,j,i,n)
+
+
+def getSeq(string_,temp,start,symbol):
+    #print('inside get seq function')
+    #print('string = ',string)
+    h = len(string_)
+    #print('h = ',h)
+    for i in range(start,h):
+        #print('string[i] = ',string[i])
+        if string_[i]==symbol :
+            getSeq(string_,temp,i+1,symbol)
+        temp+=string_[i]
+    if temp!=string_ :
+       # print('appendind ',temp, " in global_")
+        global_.append(temp)
+    return
+def fun(symbol,temp__):
+        #print('inside fun function')
+        start = 0
+        string_ = temp__
+        #print("global = ",global_)
+        #print('string = ',string)
+        temp =""
+
+        getSeq(string_,temp,start,symbol)
+        # print('fun called , temp = ',temp)
+        # if temp.count(symbol) > 0 :
+        #     l = len(temp)
+        #     for num in range(l - 1, -1,-1):
+        #         if temp[num] == symbol:
+        #             temp1 = temp
+        #             del temp1[num]
+        #             print('extended temp1 = ',temp1 )
+        #             R[j].extend(temp1)
+        #             fun(symbol,temp1,j,i,n)
 
         # while n.count(L[i]) > 0:
         #     flag = True
@@ -149,11 +193,8 @@ def checkUnit():
     for i in range(len(L)):
         temp = []
         for v in R[i]:
-            if v in V:
-                R[i].remove(v)
-            else:
-                if not v in temp:
-                    temp.append(v)
+            if not v in V and not v in temp:
+                temp.append(v)
         R[i] = temp
     return change
 def fun_(list_all):
@@ -287,11 +328,11 @@ splitNodes()
 #------------------------------------------------------------------------------------
 #####################reducing the productions#######################################
 output = True
-# if output:
-#      #output = checkEpsilon()#problems
-#      output = checkUnit() #maybeproblems
-#      output = checkUseLess()
-#      output = checkUnReachable()
+if output:
+      output = checkEpsilon()
+      output = checkUnit()
+      output = checkUseLess()
+      output = checkUnReachable()
 
 # def removeDuplicates():
 #     temp = []
@@ -303,7 +344,7 @@ output = True
 #         temp.append(Ri)
 #     R = temp
 #------------------------------------------------------------------------------------
-output = checkUnit()
+#output = checkUnit()
 #output = checkEpsilon()
 
 #
