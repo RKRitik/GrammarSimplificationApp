@@ -3,6 +3,7 @@ V = ['A','B']
 start_symbol = 'S'
 epsilon_symbol = 'e'
 S = []
+valid = True
 L = [] #stores all the LHS of the production rules
 R = [] #rhs of productions
 #string = ""
@@ -11,10 +12,10 @@ start = 0
 
 global_ = []
 #------------------------------------------------------------------------------------
-# T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
-# V = input('Enter the non-terminals ').split() # eg A B
-# start_symbol = input('Enter the Start Symbol ')
-# epsilon_symbol = input('Enter the Epsilon Symbol ')
+T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
+V = input('Enter the non-terminals ').split() # eg A B
+start_symbol = input('Enter the Start Symbol ')
+epsilon_symbol = input('Enter the Epsilon Symbol ')
 
 #------------------------------------------------------------------------------------
 V.append(start_symbol)
@@ -24,8 +25,24 @@ p = ' '
 #------------------------------------------------------------------------------------
 def printFinal():
     for l,r in zip(L,R):
-        print(l,'->',r)
+        r1 =""
+        for k in r:
+            r1+=str(k)
+            r1+='|'
+        r1 = r1[:-1]
+        print(l,'->','',r1)
 #------------------------------------------------------------------------------------
+##################checking if the grammar is invalid
+def checkInvalid():
+
+    for i in range(len(L)):
+        if L[i]==start_symbol:
+            if len(R[i])==0:
+                return False
+                break
+    return True
+#------------------------------------------------------------------------------------
+#####################entering and checking the productions#######################################
 def checkProduction(p):
      # print(p)
      if len(p)<1:
@@ -60,12 +77,12 @@ def splitNodes():
 def checkEpsilon():#check if e is in any of non starting symbols
     change = False
     for i in range(len(L)):
-        print('i = ',i)
+        #print('i = ',i)
         if not L[i]==start_symbol:
-            print('R[i] = ',R[i])
+        #    print('R[i] = ',R[i])
             if epsilon_symbol in R[i]: #checking if RHS contains epsilon
-                print('production : ',L[i],"-> ",R[i])
-                print('epsilon found for L = ',L[i])
+       #         print('production : ',L[i],"-> ",R[i])
+        #        print('epsilon found for L = ',L[i])
                 change = True
                 symbol = L[i]
                 #substituting for e in current  non-terminal
@@ -75,6 +92,7 @@ def checkEpsilon():#check if e is in any of non starting symbols
                     # print(len_)
                     #flag = False
                     for k in range(len_ - 1, -1,-1):  # traversing through each node in RHS to find the non terminal uses
+
                         global_.clear()
                         #print('k = ',k)
                         n = (R[j][k])
@@ -85,14 +103,16 @@ def checkEpsilon():#check if e is in any of non starting symbols
                         # print('z = ', z , ' i = ', i , 'n = ', n , ' L = ',L)
                #         print('symbol = ',symbol," temp = ",temp)
                         if symbol in temp:
+                            if(len(temp)>1):
                 #            print('symbol present in node index ', k)
                  #           print('R[j][k] = ',R[j][k])
-                            fun(symbol,R[j][k])#recurcive function to find all combinations after substituting the symbol
+                                fun(symbol,R[j][k])#recurcive function to find all combinations after substituting the symbol
                   #          print('out of fun function ')
                    #         print('for L = ',L[i],' global = ',global_)
-                            R[j].extend(global_)
-                            global_.clear()
-
+                                R[j].extend(global_)
+                                global_.clear()
+                            else:
+                                R[j].extend(epsilon_symbol)
                         #n = temp  # restoring
 
                     #if  flag and L[j]==start_symbol and not epsilon_symbol in R[j]:
@@ -102,19 +122,36 @@ def checkEpsilon():#check if e is in any of non starting symbols
 
     for i in range(len(L)):
          if not L[i]== start_symbol:
-             print('L = ',L[i])
+      #       print('L = ',L[i])
+             len_ = len(R[i])
              for k in range(len_ - 1, -1,-1):
                 # print('R[')
                  if R[i][k] == epsilon_symbol:
                      R[i].remove(epsilon_symbol)
-    print('new Productions : ')
-    for i in range(len(L)):
-        print(L[i],'->' , R[i])
+    #print('new Productions : ')
+    #for i in range(len(L)):
+     #   print(L[i],'->' , R[i])
 
 
 
-
-
+    len_  = len(L)
+    for i in range(len_ - 1, -1,-1):
+        if len(R[i])==0:
+            symbol = L[i]
+            for j in range(len(L)):
+                len__ = len(R[j])
+                for k in range(len__ - 1, -1, -1):
+                    if symbol in list(R[j][k]):
+                        R[j].remove(R[j][k])
+            R.remove(R[i])
+            V.remove(L[i])
+    for v in V:
+        if not v in L and not v==start_symbol:
+           for j in range(len(L)):
+                len__ = len(R[j])
+                for k in range(len__ - 1, -1, -1):
+                    if v in list(R[j][k]):
+                        R[j].remove(R[j][k])
     return change
 
 
@@ -196,6 +233,9 @@ def checkUnit():
             if not v in V and not v in temp:
                 temp.append(v)
         R[i] = temp
+    for i in range(len(L)):
+        if len(R[i])==0:
+            R.remove(R[i])
     return change
 def fun_(list_all):
     check = 1
@@ -207,16 +247,16 @@ def fun_(list_all):
                     if node in V and (not node in list_all) :
                         list_all.append(node)
                         check+=1
-    print('list_all = ',list_all)
+    #print('list_all = ',list_all)
     values = []
-    printFinal()
+    #printFinal()
     for k in range(len(R)):# traversing through production rules
         if L[k] in list_all :#checking if the lhs 's values needs to be substituted
             for l in range(len(R[k])-1,-1,-1):
                 if not R[k][l] in V:
                     values.append(R[k][l])
                     #R[k].remove(R[k][l])
-    print('values = ',values)
+    #print('values = ',values)
     return values
     # list1 = []
     # for node in R[in_]:
@@ -244,30 +284,46 @@ def fun_(list_all):
 def checkUseLess():
     change = False
     useful = []
-    # print('R = ', R)
-    for i in range(len(R)):
-        for node in R[i]:
-            if node in T:
+    for i in range(len(L)):
+        for j in range(len(R[i])):
+            newL = list(R[i][j])
+            flag = True
+            for l in newL:
+                if l in V:
+                    flag = False
+            if flag and not L[i] in useful:
                 useful.append(L[i])
-    #now check if any node in RHS is made of only one of these useful symbols
+    #print('usefull : ',useful)
+    # useful = []
+    # # print('R = ', R)
+    # for i in range(len(L)):
+    #     for node in R[i]:
+    #         newList = list(node)
+    #         print('newlist = ',newList)
+    #         for n in newList:
+    #             if  n in V and not n==start_symbol and not n in useful:
+    #                 useful.append(L[i])
+    # #now check if any node in RHS is made of only one of these useful symbols
     for  i in range(len(R)):
-        for node in R[i]:
-            if  node in useful:
-                useful.append(L[i])
+          for node in R[i]:
+              if  node in useful:
+                  useful.append(L[i])
     useLess = list(set(L)-set(useful))
-    #removing the nodes the the productions containing useless non terminals
-    # print('R = ', R)
-    for u in useLess:
-        for i in range(len(R)-1,-1,-1):
-            print('i = ',i)
-            for j in range(len(R[i])-1,-1,-1):
-                print('j = ', j)
-                # print('R = ',R)
-                # print('R[i][j] = ',R[i][j])
-                node = R[i][j]
+     #removing the nodes the the productions containing useless non terminals
+    # # print('R = ', R)
+   # print(useLess)
 
-                if u in R[i][j]:
-                    R[i].remove(R[i][j])   #check this .....
+    for u in useLess:
+         for i in range(len(R)-1,-1,-1):
+         #    print('i = ',i)
+             for j in range(len(R[i])-1,-1,-1):
+            #     print('j = ', j)
+                 # print('R = ',R)
+                 # print('R[i][j] = ',R[i][j])
+                 node = R[i][j]
+
+                 if u in R[i][j]:
+                     R[i].remove(R[i][j])   #check this .....
 
 
     return change
@@ -310,10 +366,11 @@ def checkUnReachable():
                                                     break
     if len(NotReached)>0:
         for p in NotReached:
-            index = index = L.index(p)
-            L.remove(p)
-            pR = R[index]
-            R.remove(pR)
+            if p in L:
+                index =  L.index(p)
+                L.remove(p)
+                pR = R[index]
+                R.remove(pR)
     return change
 
 
@@ -324,16 +381,34 @@ while len(p)>0:
     p = input('Enter the production rules (Enter to end)')
     if checkProduction(p):
         S.append(p)
+
+while len(p)>0:
+    check = True
+    if check:
+        for v in V:
+            if not v in L:
+                print('Enter the production rule for : ', v)
+                p = input()
+                if checkProduction(p):
+                    S.append(p)
+                    check = False
 splitNodes()
 #------------------------------------------------------------------------------------
 #####################reducing the productions#######################################
 output = True
 if output:
-      output = checkEpsilon()
-      output = checkUnit()
-      output = checkUseLess()
-      output = checkUnReachable()
-
+       if valid:
+        output = checkUseLess()
+        valid = checkInvalid()
+       if valid:
+        output = checkUnit()
+        valid =checkInvalid()
+       if valid:
+        output = checkEpsilon()
+        valid =checkInvalid()
+       if valid:
+        output = checkUnReachable()
+        valid =checkInvalid()
 # def removeDuplicates():
 #     temp = []
 #     for i in range(len(L)):
@@ -355,8 +430,10 @@ if output:
 #print('{T} = ',T,end='\n')
 #print('{V} = ',V,end='\n')
 #print('{S} = ',S,end='\n')
+if valid:
+    printFinal()
 
-printFinal()
-
+else:
+    print('Given grammar is invalid i.e no possible productions')
 #------------------------------------------------------------------------------------
 
