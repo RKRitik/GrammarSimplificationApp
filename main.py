@@ -12,10 +12,10 @@ start = 0
 
 global_ = []
 #------------------------------------------------------------------------------------
-#T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
-#V = input('Enter the non-terminals ').split() # eg A B
-#start_symbol = input('Enter the Start Symbol ')
-#epsilon_symbol = input('Enter the Epsilon Symbol ')
+T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
+V = input('Enter the non-terminals ').split() # eg A B
+start_symbol = input('Enter the Start Symbol ')
+epsilon_symbol = input('Enter the Epsilon Symbol ')
 
 #------------------------------------------------------------------------------------
 V.append(start_symbol)
@@ -34,13 +34,13 @@ def printFinal():
 #------------------------------------------------------------------------------------
 ##################checking if the grammar is invalid
 def checkInvalid():
+    flag = False
+    for r in R:
+        for t in r:
+            if t in T:
+                flag = True
 
-    for i in range(len(L)):
-        if L[i]==start_symbol:
-            if len(R[i])==0:
-                return False
-                break
-    return True
+    return flag
 #------------------------------------------------------------------------------------
 #####################entering and checking the productions#######################################
 def checkProduction(p):
@@ -87,9 +87,9 @@ def checkEpsilon():#check if e is in any of non starting symbols
                 symbol = L[i]
                 #substituting for e in current  non-terminal
                 for j in  range(len(L)): #replacing this non terminal in other production
-                    print('R[j] = ',R[j])
+
                     len_ = len(R[j])
-                    print(len_)
+
                     #flag = False
                     for k in range(len_ - 1, -1,-1):  # traversing through each node in RHS to find the non terminal uses
 
@@ -108,7 +108,7 @@ def checkEpsilon():#check if e is in any of non starting symbols
                  #           print('R[j][k] = ',R[j][k])
                                 fun(symbol,R[j][k])#recurcive function to find all combinations after substituting the symbol
                   #          print('out of fun function ')
-                                print('for L = ',L[i],' global = ',global_)
+
                                 R[j].extend(global_)
                                 global_.clear()
                             else:
@@ -140,7 +140,7 @@ def checkEpsilon():#check if e is in any of non starting symbols
             removed.append(L[i])
             del R[i]
             del L[i]
-    print(removed)
+
     for i in range(len(L)):
         len_ = len(R[i])
         for j in range(len_ - 1, -1, -1):
@@ -221,7 +221,7 @@ list_units = []
 def checkUnit():
 
     list_all = []
-    printFinal()
+
     change = False
     # #int_ = 0
     # #lis = []
@@ -253,15 +253,15 @@ def checkUnit():
         val = []
         for j in range(len(R[i])):
             if R[i][j] in V:
-                for r in R:
-                    if r == R[i][j]:
-                        for s in r:
+
+                in_ = L.index(R[i][j])
+                for s in R[in_]:
                             if not s in V:
                                 val.append(s)
 
             R[i].extend(val)
 
-    printFinal()
+
     for i in range(len(L)-1,-1,-1):
             temp = []
             for v in R[i]:
@@ -322,12 +322,10 @@ def fun_(list_all):
 
 
 def checkUseLess():
-    print('just inside checkUseless')
-    printFinal()
+
     change = False
     useful = []
-    print('L = ',L)
-    print('R = ',R)
+
     for i in range(len(L)):
         for j in range(len(R[i])):
             newL = list(R[i][j])
@@ -408,7 +406,7 @@ def checkUnReachable():
                                                 change = True
                                                 if len(NotReached) == 0:
                                                     break
-    print('not reached = ',NotReached)
+
     if len(NotReached)>0:
         for p in NotReached:
             if p in L:
@@ -440,8 +438,8 @@ splitNodes()
 #####################reducing the productions#######################################
 output = True
 
-while output:
-       print('iteration ',p)
+while output and valid:
+
        if valid:
         checkEpsilon()
         valid =checkInvalid()
