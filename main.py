@@ -12,10 +12,10 @@ start = 0
 
 global_ = []
 #------------------------------------------------------------------------------------
-T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
-V = input('Enter the non-terminals ').split() # eg A B
-start_symbol = input('Enter the Start Symbol ')
-epsilon_symbol = input('Enter the Epsilon Symbol ')
+#T = input('Enter the terminals ').split() # eg a b c do not put e as a terminal
+#V = input('Enter the non-terminals ').split() # eg A B
+#start_symbol = input('Enter the Start Symbol ')
+#epsilon_symbol = input('Enter the Epsilon Symbol ')
 
 #------------------------------------------------------------------------------------
 V.append(start_symbol)
@@ -87,9 +87,9 @@ def checkEpsilon():#check if e is in any of non starting symbols
                 symbol = L[i]
                 #substituting for e in current  non-terminal
                 for j in  range(len(L)): #replacing this non terminal in other production
-                    # print('R[j] = ',R[j])
+                    print('R[j] = ',R[j])
                     len_ = len(R[j])
-                    # print(len_)
+                    print(len_)
                     #flag = False
                     for k in range(len_ - 1, -1,-1):  # traversing through each node in RHS to find the non terminal uses
 
@@ -108,7 +108,7 @@ def checkEpsilon():#check if e is in any of non starting symbols
                  #           print('R[j][k] = ',R[j][k])
                                 fun(symbol,R[j][k])#recurcive function to find all combinations after substituting the symbol
                   #          print('out of fun function ')
-                   #         print('for L = ',L[i],' global = ',global_)
+                                print('for L = ',L[i],' global = ',global_)
                                 R[j].extend(global_)
                                 global_.clear()
                             else:
@@ -128,30 +128,46 @@ def checkEpsilon():#check if e is in any of non starting symbols
                 # print('R[')
                  if R[i][k] == epsilon_symbol:
                      R[i].remove(epsilon_symbol)
-    #print('new Productions : ')
-    #for i in range(len(L)):
-     #   print(L[i],'->' , R[i])
+    # print('new Productions : ')
+    # for i in range(len(L)):
+    #     print(L[i],'->' , R[i])
 
 
-
-    len_  = len(L)
-    for i in range(len_ - 1, -1,-1):
+    removed = []
+    for i in range(len(L)-1,-1,-1):
         if len(R[i])==0:
-            symbol = L[i]
-            for j in range(len(L)):
-                len__ = len(R[j])
-                for k in range(len__ - 1, -1, -1):
-                    if symbol in list(R[j][k]):
-                        R[j].remove(R[j][k])
-            R.remove(R[i])
-            V.remove(L[i])
-    for v in V:
-        if not v in L and not v==start_symbol:
-           for j in range(len(L)):
-                len__ = len(R[j])
-                for k in range(len__ - 1, -1, -1):
-                    if v in list(R[j][k]):
-                        R[j].remove(R[j][k])
+
+            removed.append(L[i])
+            del R[i]
+            del L[i]
+    print(removed)
+    for i in range(len(L)):
+        len_ = len(R[i])
+        for j in range(len_ - 1, -1, -1):
+            liss = list(R[i][j])
+
+            for r in removed:
+                if r in liss:
+                    R[i].remove(R[i][j])
+    #for l in R:
+    # len_  = len(L)
+    # for i in range(len_ - 1, -1,-1):
+    #     if len(R[i])==0:
+    #         symbol = L[i]
+    #         for j in range(len(L)):
+    #             len__ = len(R[j])
+    #             for k in range(len__ - 1, -1, -1):
+    #                 if symbol in list(R[j][k]):
+    #                     R[j].remove(R[j][k])
+    #         R.remove(R[i])
+    #         V.remove(L[i])
+    # for v in V:
+    #     if not v in L and not v==start_symbol:
+    #        for j in range(len(L)):
+    #             len__ = len(R[j])
+    #             for k in range(len__ - 1, -1, -1):
+    #                 if v in list(R[j][k]):
+    #                     R[j].remove(R[j][k])
     return change
 
 
@@ -203,39 +219,63 @@ def fun(symbol,temp__):
 list_units = []
 
 def checkUnit():
+
     list_all = []
+    printFinal()
     change = False
-    #int_ = 0
-    #lis = []
-    for i in range(len(L)):
-        values = []
-        for j in range(len(R[i])-1,-1,-1):
-              lis = []
-             # print('R[i][j] = ',R[i][j])
-              if  R[i][j] in V: #finding the unit production
-                   change= True
-                   val = R[i][j]
-                   list_all.append(val)
-                  # print('removing ',val)
-                #   R[i].remove(val) #removing the unit production from production rules
-                   #in_ = L.index(val)
-                   values.extend(fun_(list_all))
-                   list_all.clear()
+    # #int_ = 0
+    # #lis = []
+    # le = len(L)
+    # for i in range(le-1,-1,-1):
+    #     values = []
+    #     if len(R[i])>1:
+    #         l = len(R[i])
+    #         for j in range(l-1,-1,-1):
+    #             lis = []
+    #             print('R[i][j] = ',R[i][j])
+    #
+    #             if  R[i][j] in V: #finding the unit production
+    #                print('remove ',R[i][j])
+    #                change= True
+    #                val = R[i][j]
+    #                list_all.append(val)
+    #                print('removing unit production',val)
+    #             #   R[i].remove(val) #removing the unit production from production rules
+    #                #in_ = L.index(val)
+    #                values.extend(fun_(list_all))
+    #                list_all.clear()
+    #
+    #
+    #         R[i].extend(values)
+    #         list_all.clear()
+    #         values.clear()
+    for i in range(len(L)-1,-1,-1):
+        val = []
+        for j in range(len(R[i])):
+            if R[i][j] in V:
+                for r in R:
+                    if r == R[i][j]:
+                        for s in r:
+                            if not s in V:
+                                val.append(s)
 
+            R[i].extend(val)
 
-        R[i].extend(values)
-        list_all.clear()
-        values.clear()
+    printFinal()
+    for i in range(len(L)-1,-1,-1):
+            temp = []
+            for v in R[i]:
+                if not v in V and not v in temp:
+                    temp.append(v)
 
-    for i in range(len(L)):
-        temp = []
-        for v in R[i]:
-            if not v in V and not v in temp:
-                temp.append(v)
-        R[i] = temp
-    for i in range(len(L)):
-        if len(R[i])==0:
-            R.remove(R[i])
+            R[i] = temp
+            # if len(temp)==0:
+            #     L.remove(L[i])
+    lenn = len(L)
+    for i in range(lenn-1,-1,-1):
+
+            if len(R[i])==0:
+                R.remove(R[i])
     return change
 def fun_(list_all):
     check = 1
@@ -282,8 +322,12 @@ def fun_(list_all):
 
 
 def checkUseLess():
+    print('just inside checkUseless')
+    printFinal()
     change = False
     useful = []
+    print('L = ',L)
+    print('R = ',R)
     for i in range(len(L)):
         for j in range(len(R[i])):
             newL = list(R[i][j])
@@ -354,7 +398,7 @@ def checkUnReachable():
                             else:
                                 #print("finding indirect reachables")
                                 #print(" R[i][j][k] = ", R[i][j][k])
-                                if R[i][j][k] in V :
+                                if R[i][j][k] in V and R[i][j][k] in L:
                                     index = L.index(R[i][j][k])
                                    # print('checking production number ' ,index)
                                     for node in R[index]:
@@ -364,13 +408,12 @@ def checkUnReachable():
                                                 change = True
                                                 if len(NotReached) == 0:
                                                     break
+    print('not reached = ',NotReached)
     if len(NotReached)>0:
         for p in NotReached:
             if p in L:
-                index =  L.index(p)
                 L.remove(p)
-                pR = R[index]
-                R.remove(pR)
+            V.remove(p)
     return change
 
 
@@ -396,19 +439,27 @@ splitNodes()
 #------------------------------------------------------------------------------------
 #####################reducing the productions#######################################
 output = True
-if output:
+
+while output:
+       print('iteration ',p)
+       if valid:
+        checkEpsilon()
+        valid =checkInvalid()
+
+        if valid:
+            output = checkUnit()
+            valid = checkInvalid()
+
+        if valid:
+            output = checkUnReachable()
+            valid =checkInvalid()
+
        if valid:
         output = checkUseLess()
         valid = checkInvalid()
-       if valid:
-        output = checkUnit()
-        valid =checkInvalid()
-       if valid:
-        output = checkEpsilon()
-        valid =checkInvalid()
-       if valid:
-        output = checkUnReachable()
-        valid =checkInvalid()
+
+
+
 # def removeDuplicates():
 #     temp = []
 #     for i in range(len(L)):
